@@ -1,25 +1,30 @@
 package com.example.e_commerce.Service.ProductService;
 
-import com.example.e_commerce.Entity.Product;
+
 import com.example.e_commerce.DTO.ProductDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface ProductService {
 
-    Product addProduct(ProductDTO productDTO);
+    // Create
+    ProductDTO addProduct(ProductDTO dto);
 
-    Product updateProduct(Long id , Product product);
+    // Update
+    ProductDTO updateProduct(Long id, ProductDTO dto);
 
+    // Delete
     void deleteProductById(Long id);
 
-    Product getProductById(Long id);
+    // Read
+    ProductDTO getProductById(Long id);
 
-    List<Product> getAllProducts();
+    List<ProductDTO> getAllProducts();
 
-    List<Product> getProductByName(String name);
+    List<ProductDTO> getProductsByName(String name);
 
-    List<Product> getProductByCategory(String categoryName);
+    List<ProductDTO> getProductsByCategory(String categoryName);
 
-    void deleteByName(String name);
 }

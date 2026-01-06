@@ -1,9 +1,11 @@
 package com.example.e_commerce.controller;
 
-import com.example.e_commerce.Entity.Product;
 import com.example.e_commerce.Service.ProductService.ProductService;
 import com.example.e_commerce.DTO.ProductDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,32 +20,39 @@ public class ProductController {
 
     //Get all products
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
+
     }
 
     //Get product by ID
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id) {
+    public ProductDTO getProductById(@PathVariable Long id) {
         return (productService.getProductById(id));
     }
 
     //Search by name
     @GetMapping("/search/{name}")
-    public ResponseEntity<List<Product>> getProductByName(@PathVariable String name) {
-        return ResponseEntity.ok(productService.getProductByName(name));
+    public ResponseEntity<List<ProductDTO>> getProductByName(@PathVariable String name) {
+        return ResponseEntity.ok(productService.getProductsByName(name));
+    }
+
+    //Search by categoryName
+    @GetMapping("/searchByCategory/{categoryName}")
+    public ResponseEntity<List<ProductDTO>> getProductsByCategory(@PathVariable String categoryName){
+        return ResponseEntity.ok(productService.getProductsByCategory(categoryName));
     }
 
     //Add new product
     @PostMapping
-    public ResponseEntity<Product> addProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<ProductDTO> addProduct(@Valid@RequestBody ProductDTO productDTO) {
         return ResponseEntity.ok(productService.addProduct(productDTO));
     }
 
     //Update product
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return ResponseEntity.ok(productService.updateProduct(id, product));
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
+        return ResponseEntity.ok(productService.updateProduct(id, productDTO));
     }
 
     //Delete by ID
@@ -54,9 +63,9 @@ public class ProductController {
     }
 
     //Delete by name
-    @DeleteMapping("/delete/{name}")
+    /*@DeleteMapping("/delete/{name}")
     public ResponseEntity<String> deleteProductByName(@PathVariable String name) {
-        productService.deleteByName(name);
+        productService.deleteProductByName(name);
         return ResponseEntity.ok("Product deleted successfully by name");
-    }
+    }*/
 }

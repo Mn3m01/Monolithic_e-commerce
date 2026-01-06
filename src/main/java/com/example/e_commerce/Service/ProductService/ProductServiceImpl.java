@@ -1,112 +1,160 @@
 package com.example.e_commerce.Service.ProductService;
+
+import com.example.e_commerce.DTO.ProductDTO;
 import com.example.e_commerce.Entity.Category;
 import com.example.e_commerce.Entity.Product;
+import com.example.e_commerce.Mapper.ProductMapper;
 import com.example.e_commerce.Repository.CategoryRepo;
 import com.example.e_commerce.Repository.ProductRepo;
-import com.example.e_commerce.DTO.ProductDTO;
+import com.example.e_commerce.GlobalExeption.*;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
-    private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
     private final ProductRepo productRepo;
     private final CategoryRepo categoryRepo;
+    private final ProductMapper mapper;
 
-
+    /*----------------------------------------------------------
+                      ADD PRODUCT
+     ----------------------------------------------------------*/
     @Override
-    public Product addProduct(ProductDTO productDTO) {
-        Category category = categoryRepo.findByName(productDTO.getCategoryName())
-                .orElseGet(()->{
-                    Category newCategory = new Category();
-                    newCategory.setName(productDTO.getCategoryName());
-                    return categoryRepo.save(newCategory);
+    @Transactional
+    public ProductDTO addProduct(ProductDTO dto) {
+        // basic business validations
+        if (dto.getPrice() == null || dto.getPrice().signum() <= 0) {
+            throw new BusinessValidationException("Price must be greater than zero");
+        }
+        if (dto.getQuantity() != null && dto.getQuantity() < 0) {
+            throw new BusinessValidationException("Quantity cannot be negative");
+        }
+
+
+        // map DTO -> entity (mapper will ignore category & images; we handle category here)
+        Product product = mapper.toEntity(dto);
+
+        // find or create category
+        Category category = categoryRepo.findByName(dto.getCategoryName())
+                .orElseGet(() -> {
+                    Category c = new Category();
+                    c.setName(dto.getCategoryName());
+                    c.setDescription(dto.getCategoryDescription());
+                    return categoryRepo.save(c);
                 });
-        Product product = Product.builder()
-                .name(productDTO.getName())
-                .description(productDTO.getDescription())
-                .price(productDTO.getPrice())
-                .quantity(productDTO.getQuantity())
-                .category(category)
-                .build();
 
-        return productRepo.save(product);
+        product.setCategory(category);
+
+        Product saved = productRepo.save(product);
+        log.info("Product created: id={} name={}", saved.getId(), saved.getName());
+        return mapper.toDTO(saved);
     }
 
+
+    /*----------------------------------------------------------
+                      UPDATE PRODUCT
+     ----------------------------------------------------------*/
     @Override
-    public Product updateProduct(Long id, Product product) {
-        return productRepo.findById(id)
-                .map(existing -> {
-                    existing.setName(product.getName());
-                    existing.setDescription(product.getDescription());
-                    existing.setPrice(product.getPrice());
-                    existing.setQuantity(product.getQuantity());
-                    existing.setCategory(product.getCategory());
-                    //existing.setImages(product.getImages());
-                    log.info("Updated product with id {}", id);
-                    return productRepo.save(existing);
-                })
-                .orElseThrow(() -> new RuntimeException("Product Not Found with id: " + id));
+    @Transactional
+    public ProductDTO updateProduct(Long id, ProductDTO dto) {
+        Product existing = productRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+
+        // business validations
+        if (dto.getPrice() != null && dto.getPrice().signum() <= 0) {
+            throw new BusinessValidationException("Price must be greater than zero");
+        }
+        if (dto.getQuantity() != null && dto.getQuantity() < 0) {
+            throw new BusinessValidationException("Quantity cannot be negative");
+        }
+
+        // update simple fields if present
+        if (dto.getDescription() != null) existing.setDescription(dto.getDescription());
+        if (dto.getPrice() != null) existing.setPrice(dto.getPrice());
+        if (dto.getQuantity() != null) existing.setQuantity(dto.getQuantity());
+
+        // update category if provided
+        if (dto.getCategoryName() != null) {
+            Category category = categoryRepo.findByName(dto.getCategoryName())
+                    .orElseGet(() -> {
+                        Category c = new Category();
+                        c.setName(dto.getCategoryName());
+                        c.setDescription(dto.getCategoryDescription());
+                        return categoryRepo.save(c);
+                    });
+            existing.setCategory(category);
+        }
+
+        Product updated = productRepo.save(existing);
+        log.info("Product updated: id={}", updated.getId());
+        return mapper.toDTO(updated);
     }
 
+    /*----------------------------------------------------------
+                      DELETE PRODUCT BY ID
+     ----------------------------------------------------------*/
     @Override
     @Transactional
     public void deleteProductById(Long id) {
         Product product = productRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product Not Found with id : " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
         productRepo.delete(product);
-        productRepo.flush();
+        log.info("Product deleted id={}", id);
     }
 
-
+    /*----------------------------------------------------------
+                      GET PRODUCT BY ID
+     ----------------------------------------------------------*/
     @Override
-    public Product getProductById(Long id) {
-        return productRepo.findById(id).orElseThrow(()-> new RuntimeException("Product Not Found with id: " + id));
+    public ProductDTO getProductById(Long id) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+        return mapper.toDTO(product);
     }
 
+    /*----------------------------------------------------------
+                      GET ALL PRODUCTS
+     ----------------------------------------------------------*/
     @Override
-    public List<Product> getAllProducts() {
-        return productRepo.findAll();
+    public List<ProductDTO> getAllProducts() {
+        return productRepo.findAll()
+                .stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
     }
 
+    /*----------------------------------------------------------
+                     GET PRODUCT BY NAME
+     ----------------------------------------------------------*/
     @Override
-    public List<Product> getProductByName(String name) {
-
-        return productRepo.findByName(name);
+    public List<ProductDTO> getProductsByName(String name) {
+        return productRepo.findByNameContainingIgnoreCase(name)
+                .stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
     }
 
+    /*----------------------------------------------------------
+                    GET PRODUCT BY CATEGORY
+     ----------------------------------------------------------*/
     @Override
-    public List<Product> getProductByCategory(String categoryName) {
-        return productRepo.findByCategory_Name(categoryName);
+    public List<ProductDTO> getProductsByCategory(String categoryName) {
+        return productRepo.findByCategory_Name(categoryName)
+                .stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
     }
 
 
-    @Transactional
-    public void deleteByName(String name) {
-        productRepo.deleteByName(name);
-    }
 
-    public ProductDTO convertToDTO(Product product) {
-        return ProductDTO.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .quantity(product.getQuantity())
-                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
-                .imagesUrls(product.getImages() != null
-                        ? product.getImages().stream()
-                        .map(image -> image.getImageUrl())
-                        .collect(Collectors.toList())
-                        : null)
-                .build();
-    }
 }
