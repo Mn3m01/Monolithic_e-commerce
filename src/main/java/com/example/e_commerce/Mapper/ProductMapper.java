@@ -34,6 +34,7 @@ public interface ProductMapper {
        ============================================================ */
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "images", ignore = true)
     void updateEntityFromDTO(ProductDTO dto, @MappingTarget Product product);
@@ -44,19 +45,19 @@ public interface ProductMapper {
        ============================================================ */
 
     default List<String> mapImagesToUrls(List<Image> images) {
-        if (images == null) return null;
+        if (images == null) return List.of();
 
         return images.stream()
                 .map(Image::getImageUrl)
                 .collect(Collectors.toList());
     }
 
-    default Category mapCategoryFromName(String name, String description) {
+    default Category mapCategory(String name, String description) {
         if (name == null) return null;
 
-        Category c = new Category();
-        c.setName(name);
-        c.setDescription(description);
-        return c;
+        Category category = new Category();
+        category.setName(name);
+        category.setDescription(description);
+        return category;
     }
 }

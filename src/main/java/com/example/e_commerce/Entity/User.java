@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -28,6 +29,8 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    private LocalDateTime created_at;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

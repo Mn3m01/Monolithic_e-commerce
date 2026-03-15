@@ -21,7 +21,7 @@ public interface ProductService {
     // Read
     ProductDTO getProductById(Long id);
 
-    List<ProductDTO> getAllProducts();
+    Page<ProductDTO> getAllProducts(Pageable pageable);
 
     List<ProductDTO> getProductsByName(String name);
 

@@ -79,9 +79,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // update simple fields if present
-        if (dto.getDescription() != null) existing.setDescription(dto.getDescription());
-        if (dto.getPrice() != null) existing.setPrice(dto.getPrice());
-        if (dto.getQuantity() != null) existing.setQuantity(dto.getQuantity());
+        mapper.updateEntityFromDTO(dto,existing);
 
         // update category if provided
         if (dto.getCategoryName() != null) {
@@ -126,11 +124,9 @@ public class ProductServiceImpl implements ProductService {
                       GET ALL PRODUCTS
      ----------------------------------------------------------*/
     @Override
-    public List<ProductDTO> getAllProducts() {
-        return productRepo.findAll()
-                .stream()
-                .map(mapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<ProductDTO> getAllProducts(Pageable pageable) {
+        return productRepo.findAll(pageable)
+                .map(mapper::toDTO);
     }
 
     /*----------------------------------------------------------

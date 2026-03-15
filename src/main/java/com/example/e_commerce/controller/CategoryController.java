@@ -1,23 +1,24 @@
 package com.example.e_commerce.controller;
 
 import com.example.e_commerce.Entity.Category;
-import com.example.e_commerce.Service.CategoryService.ICategoryService;
+import com.example.e_commerce.Service.CategoryService.CategoryService;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
 
-    private final ICategoryService categoryService;
+    private final CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<List<Category>> getAllCategories(){
-        List<Category> categories = categoryService.getAllCategories();
+    public ResponseEntity<Page<Category>> getAllCategories(Pageable pageable) {
+        Page<Category> categories = categoryService.getAllCategories(pageable);
         return ResponseEntity.ok(categories);
     }
 
