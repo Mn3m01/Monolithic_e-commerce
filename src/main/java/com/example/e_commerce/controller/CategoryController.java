@@ -1,7 +1,7 @@
 package com.example.e_commerce.controller;
 
-import com.example.e_commerce.Entity.Category;
-import com.example.e_commerce.Service.CategoryService.CategoryService;
+import com.example.e_commerce.entity.Category;
+import com.example.e_commerce.service.CategoryService.CategoryService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

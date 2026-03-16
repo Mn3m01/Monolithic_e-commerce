@@ -1,12 +1,11 @@
 package com.example.e_commerce.config;
 
-import com.example.e_commerce.Service.JwtService;
-import com.example.e_commerce.Service.UserDetailsServiceImpl;
+import com.example.e_commerce.service.auth.JwtService;
+import com.example.e_commerce.service.auth.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;

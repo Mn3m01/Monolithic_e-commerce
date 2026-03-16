@@ -1,7 +1,6 @@
 package com.example.e_commerce.config;
 
-import com.example.e_commerce.Service.UserDetailsServiceImpl;
-import lombok.RequiredArgsConstructor;
+import com.example.e_commerce.service.auth.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

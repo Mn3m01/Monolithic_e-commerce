@@ -1,7 +1,7 @@
 package com.example.e_commerce.controller;
 
-import com.example.e_commerce.Service.ProductService.ProductService;
-import com.example.e_commerce.DTO.ProductDTO;
+import com.example.e_commerce.service.ProductService.ProductService;
+import com.example.e_commerce.dto.product.ProductDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

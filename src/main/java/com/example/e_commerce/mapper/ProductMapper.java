@@ -1,0 +1,63 @@
+package com.example.e_commerce.mapper;
+
+import com.example.e_commerce.dto.product.ProductDTO;
+import com.example.e_commerce.entity.Category;
+import com.example.e_commerce.entity.Image;
+import com.example.e_commerce.entity.Product;
+import org.mapstruct.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Mapper(componentModel = "spring")
+public interface ProductMapper {
+
+    /* ============================================================
+       =============== ENTITY -> DTO MAPPING ======================
+       ============================================================ */
+
+    @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(source = "category.description", target = "categoryDescription")
+    @Mapping(target = "imagesUrls", expression = "java(mapImagesToUrls(product.getImages()))")
+    ProductDTO toDTO(Product product);
+
+    /* ============================================================
+       =============== DTO -> ENTITY MAPPING ======================
+       ============================================================ */
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "images", ignore = true)
+    Product toEntity(ProductDTO dto);
+
+    /* ============================================================
+       =============== UPDATE ENTITY FROM DTO =====================
+       ============================================================ */
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "images", ignore = true)
+    void updateEntityFromDTO(ProductDTO dto, @MappingTarget Product product);
+
+
+    /* ============================================================
+       ============ HELPERS FOR CUSTOM MAPPINGS ===================
+       ============================================================ */
+
+    default List<String> mapImagesToUrls(List<Image> images) {
+        if (images == null) return List.of();
+
+        return images.stream()
+                .map(Image::getImageUrl)
+                .collect(Collectors.toList());
+    }
+
+    default Category mapCategory(String name, String description) {
+        if (name == null) return null;
+
+        Category category = new Category();
+        category.setName(name);
+        category.setDescription(description);
+        return category;
+    }
+}

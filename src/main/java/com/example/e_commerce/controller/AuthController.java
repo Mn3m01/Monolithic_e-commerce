@@ -1,8 +1,8 @@
 package com.example.e_commerce.controller;
 
-import com.example.e_commerce.DTO.LoginDTO;
-import com.example.e_commerce.DTO.RegisterDTO;
-import com.example.e_commerce.Service.AuthenticationService;
+import com.example.e_commerce.dto.auth.LoginDTO;
+import com.example.e_commerce.dto.auth.RegisterDTO;
+import com.example.e_commerce.service.auth.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

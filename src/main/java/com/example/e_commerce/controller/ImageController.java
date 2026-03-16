@@ -1,9 +1,8 @@
 package com.example.e_commerce.controller;
 
 
-import com.example.e_commerce.Entity.Image;
-import com.example.e_commerce.Service.ImageService.ImageService;
-import com.example.e_commerce.Service.ImageService.ImageServiceImp;
+import com.example.e_commerce.entity.Image;
+import com.example.e_commerce.service.ImageService.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
