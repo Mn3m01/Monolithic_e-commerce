@@ -47,5 +47,20 @@ services:
     depends_on:
       - postgres
 
+  frontend:
+    image: node:20-alpine
+    container_name: ecommerce_frontend
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+    volumes:
+      # assumes frontend source at d:\Downloads\e-commerce\frontend
+      - ../frontend:/app
+    command: sh -c "npm install --include=dev && npm run dev -- --host 0.0.0.0 --port 5173 --strictPort"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - app
+
 volumes:
   postgres_data:

@@ -3,6 +3,7 @@ package com.example.e_commerce.controller;
 import com.example.e_commerce.dto.auth.LoginDTO;
 import com.example.e_commerce.dto.auth.RegisterDTO;
 import com.example.e_commerce.service.auth.AuthenticationService;
+import com.example.e_commerce.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,5 +28,10 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> login(@Valid@RequestBody LoginDTO loginDTO) {
         String token = authService.authenticate(loginDTO);
         return ResponseEntity.ok(Map.of("token", token));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<User> me() {
+        return ResponseEntity.ok(authService.getCurrentUser());
     }
 }

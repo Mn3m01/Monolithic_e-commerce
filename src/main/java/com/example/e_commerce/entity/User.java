@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.Email;
+
 
 @Entity
 @Table(name = "users")
